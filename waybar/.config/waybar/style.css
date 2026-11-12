@@ -43,6 +43,7 @@ color: #cdd6f4;
 
 #clock,
 #pulseaudio,
+#network,
 #cpu,
 #memory,
 #battery,
@@ -57,4 +58,8 @@ color: #f9e2af;
 
 #battery.critical {
 color: #f38ba8;
+}
+
+#network.disconnected {
+color: #f38ba8; /* Vermelho quando desconectado */
 }

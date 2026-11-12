@@ -12,6 +12,7 @@
     ],
     "modules-right": [
         "pulseaudio",
+        "network",
         "cpu",
         "memory",
         "battery",
@@ -56,6 +57,35 @@
         "tooltip": false
     },
 
+    // Detecção dinâmica de dispositivo de áudio
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} {volume}%",
+        "format-muted": "󰝟 Muted",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "󰋎",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "foot --app-id=pavucontrol pulsemixer",
+        "tooltip": false
+    },
+
+    // Monitoramento de Rede orientado a eventos (0% CPU)
+    "network": {
+        "interval": 5,
+        "format-wifi": " {signalStrength}%",
+        "format-ethernet": "󰈀 Cabo",
+        "format-linked": "󰈀 Sem IP",
+        "format-disconnected": "󰤭 Off",
+        "on-click": "foot -e nmtui",
+        "tooltip": false
+    },
+
     "cpu": {
         "interval": 5,
         "format": "CPU {usage}%",
@@ -65,13 +95,6 @@
     "memory": {
         "interval": 5,
         "format": "RAM {percentage}%",
-        "tooltip": false
-    },
-
-    "pulseaudio": {
-        "format": "VOL {volume}%",
-        "format-muted": "MUTED",
-        "on-click": "foot --app-id=pavucontrol pulsemixer",
         "tooltip": false
     },
 
