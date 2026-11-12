@@ -16,6 +16,7 @@
         "cpu",
         "custom/gpu",
         "memory",
+        "power-profiles-daemon",
         "battery",
         "tray"
     ],
@@ -108,14 +109,26 @@
         "tooltip": false
     },
 
+    "power-profiles-daemon": {
+        "format": "<span color=\"#7f849c\">{icon}</span>",
+        "tooltip": false,
+        "format-icons": {
+            "default": "",
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        }
+    },
+
     "battery": {
         "interval": 30,
         "states": {
-            "warning": 20,
-            "critical": 10
+            "warning": 15,
+            "critical": 07
         },
         "format": "<span color=\"#7f849c\">BAT</span> {capacity:02}%",
         "format-charging": "<span color=\"#a6e3a1\">CHG</span> {capacity:02}%",
+        "on-click": "~/.config/waybar/scripts/power-profile.sh",
         "tooltip": false
     },
 }
