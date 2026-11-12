@@ -14,6 +14,7 @@
         "pulseaudio",
         "network",
         "cpu",
+        "custom/gpu",
         "memory",
         "battery",
         "tray"
@@ -88,7 +89,14 @@
 
     "cpu": {
         "interval": 5,
-        "format": "CPU {usage}%",
+        "format": "CPU {usage:02}%",
+        "tooltip": false
+    },
+
+    "custom/gpu": {
+        "interval": 5,
+        "exec": "cat /sys/class/drm/card1/gt_act_freq_mhz",
+        "format": "GPU {:>4}MHz",
         "tooltip": false
     },
 
