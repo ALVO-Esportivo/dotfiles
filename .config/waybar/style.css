@@ -1,0 +1,60 @@
+* {
+border: none;
+border-radius: 0;
+font-family: monospace;
+font-size: 12px;
+min-height: 0;
+
+/* Desativa interpolação de estilos para resposta imediata */
+transition: none;
+}
+
+window#waybar {
+    background-color: #11111b;
+    color: #cdd6f4;
+}
+
+#workspaces button {
+padding: 0 6px;
+background-color: transparent;
+color: #6c7086;
+}
+
+#workspaces button.active {
+color: #ff5555;            /* Texto e ícone em vermelho */
+background-color: #313244; /* Fundo do botão (mantenha ou altere como preferir) */
+border-bottom: 2px solid #ff5555; /* borda inferior: espessura e cor */
+}
+
+#workspaces button.urgent {
+background-color: #f38ba8;
+color: #11111b;
+}
+
+#workspaces button.special {
+color: #89b4fa;
+border-bottom: 2px solid #89b4fa;
+}
+
+#workspaces button.special.active {
+background-color: #45475a;
+color: #cdd6f4;
+}
+
+#clock,
+#pulseaudio,
+#cpu,
+#memory,
+#battery,
+#tray {
+padding: 0 8px;
+color: #cdd6f4;
+}
+
+#battery.warning {
+color: #f9e2af;
+}
+
+#battery.critical {
+color: #f38ba8;
+}
