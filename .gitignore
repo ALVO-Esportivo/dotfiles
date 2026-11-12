@@ -1,0 +1,10 @@
+# Arquivos de log e cache
+*.log
+*~
+*.swp
+.cache/
+
+# Histórico e segredos
+.env
+*.token
+credentials.json
