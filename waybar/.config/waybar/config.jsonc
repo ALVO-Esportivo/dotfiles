@@ -59,10 +59,11 @@
     },
 
     // Detecção dinâmica de dispositivo de áudio
+    // Áudio com ícone atenuado e valor padronizado
     "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-bluetooth": "{icon} {volume}%",
-        "format-muted": "󰝟 Muted",
+        "format": "<span color=\"#7f849c\">{icon}</span> {volume:02}%",
+        "format-bluetooth": "<span color=\"#7f849c\">{icon}</span> {volume:02}%",
+        "format-muted": "<span color=\"#f38ba8\">󰝟</span> Muted",
         "format-icons": {
             "headphone": "",
             "hands-free": "",
@@ -76,33 +77,34 @@
         "tooltip": false
     },
 
-    // Monitoramento de Rede orientado a eventos (0% CPU)
+    // Rede com ícone atenuado e valor de 2 dígitos
     "network": {
         "interval": 5,
-        "format-wifi": " {signalStrength}%",
-        "format-ethernet": "󰈀 Cabo",
-        "format-linked": "󰈀 Sem IP",
-        "format-disconnected": "󰤭 Off",
+        "format-wifi": "<span color=\"#7f849c\"></span> {signalStrength:02}%",
+        "format-ethernet": "<span color=\"#7f849c\">󰈀</span> Cabo",
+        "format-linked": "<span color=\"#7f849c\">󰈀</span> Sem IP",
+        "format-disconnected": "<span color=\"#f38ba8\">󰤭</span> Off",
         "on-click": "foot -e nmtui",
         "tooltip": false
     },
 
+    // Hardware: rótulos escurecidos e espaçamento único fixo
     "cpu": {
         "interval": 5,
-        "format": "CPU {usage:02}%",
+        "format": "<span color=\"#7f849c\">CPU</span> {usage:02}%",
         "tooltip": false
     },
 
     "custom/gpu": {
         "interval": 5,
         "exec": "cat /sys/class/drm/card1/gt_act_freq_mhz",
-        "format": "GPU {:>4}MHz",
+        "format": "<span color=\"#7f849c\">GPU</span> {}MHz",
         "tooltip": false
     },
 
     "memory": {
         "interval": 5,
-        "format": "RAM {percentage}%",
+        "format": "<span color=\"#7f849c\">RAM</span> {percentage:02}%",
         "tooltip": false
     },
 
@@ -112,12 +114,8 @@
             "warning": 20,
             "critical": 10
         },
-        "format": "BAT {capacity}%",
-        "format-charging": "CHG {capacity}%",
+        "format": "<span color=\"#7f849c\">BAT</span> {capacity:02}%",
+        "format-charging": "<span color=\"#a6e3a1\">CHG</span> {capacity:02}%",
         "tooltip": false
     },
-
-    "tray": {
-        "spacing": 8
-    }
 }
