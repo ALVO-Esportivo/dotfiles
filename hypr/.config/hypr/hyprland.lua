@@ -126,7 +126,8 @@ hl.bind(mainMod .. " + P", hl.dsp.window.pseudo()) -- ainda não sei o que faz
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- não sei o que faz
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock")) -- bloqueia a sessão
 hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy")) -- histórco de ctrl+C (100)
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("pkill hyprsunset || hyprsunset --temperature 4000")) -- alterna a temperatura de cor da tela
+
+--hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("pkill hyprsunset || hyprsunset --temperature 4000")) -- alterna a temperatura de cor da tela
 
 -- OCR da tela direto para o clipboard (Português + Inglês)
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd([[grim -g "$(slurp)" - | tesseract stdin stdout -l por+eng | tr -d '\f' | wl-copy]]))
@@ -209,6 +210,13 @@ end
         hl.bind(mainMod .. " + ALT + A",        hl.dsp.window.move({ workspace = "name:agenda",   silent = true }))
         hl.bind(mainMod .. " + ALT + CTRL + E", hl.dsp.window.move({ workspace = "name:email",    silent = true }))
         hl.bind(mainMod .. " + ALT + F",        hl.dsp.window.move({ workspace = "name:arquivos", silent = true }))
+
+-- JANELAS ACIMA DE 10
+        -- Pula para o próximo workspace vazio disponível (ex: 11, 12...)
+        hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("hyprctl dispatch workspace empty"))
+
+        -- Envia a janela atual para o próximo workspace vazio sem sair da tela
+        hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("hyprctl dispatch movetoworkspacesilent empty"))
 
     -- ==========================================
     -- 7. REGRAS DE JANELAS
