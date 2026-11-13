@@ -290,4 +290,15 @@ end
         size   = "850 550", -- Largura e Altura em pixels
     })
 
+    -- ==========================================
+    -- TERMINAL SEMPRE FLUTUANTE
+    -- ==========================================
+    hl.window_rule({
+        name  = "floating-terminal",
+        match = {
+            class = "^(foot|footclient)$",
+        },
+        float = true,
+    })
+
 
