@@ -1,0 +1,51 @@
+# Fonte e Geometria
+font=monospace 10
+width=320
+height=120
+margin=10
+padding=12
+border-size=2
+border-radius=6
+max-visible=3
+max-history=10
+sort=-time
+
+# Posicionamento (canto superior direito, logo abaixo da Waybar)
+anchor=top-right
+layer=overlay
+
+# Cores (Catppuccin Mocha)
+background-color=#1e1e2e
+text-color=#cdd6f4
+border-color=#7f849c
+progress-color=over #313244
+
+# Comportamento padrão
+default-timeout=5000
+ignore-timeout=0
+icons=1
+max-icon-size=48
+markup=1
+actions=1
+
+# Clique esquerdo abre/executa a ação; clique direito dispensa
+on-button-left=invoke-default-action
+on-button-right=dismiss
+
+# Agrupamento de notificações repetidas (ex: volume ou energia)
+group-by=app-name
+format=<b>%s</b>\n%b
+
+# Urgência Baixa (ex: alternância de perfil de energia)
+[urgency=low]
+border-color=#45475a
+default-timeout=2500
+
+# Urgência Alta (ex: bateria crítica — fica visível até ser dispensada)
+[urgency=high]
+border-color=#f38ba8
+default-timeout=0
+
+# Modo Não Perturbe (oculta popups na tela, mas mantém no histórico)
+[mode=dnd]
+invisible=1

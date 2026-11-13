@@ -159,6 +159,19 @@ hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprctl dispatch workspace previou
 -- SUPER + W: lista todas as janelas abertas e salta direto para a escolhida
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch focuswindow "address:$addr"']]))
 
+-- ==========================================
+-- NOTIFICAÇÕES (MAKO)
+-- ==========================================
+-- Dispensa a notificação atual / todas as notificações
+hl.bind(mainMod .. " + BackSpace",         hl.dsp.exec_cmd("makoctl dismiss"))
+hl.bind(mainMod .. " + SHIFT + BackSpace", hl.dsp.exec_cmd("makoctl dismiss -a"))
+
+-- Restaura a última notificação dispensada (histórico)
+hl.bind(mainMod .. " + CTRL + BackSpace",  hl.dsp.exec_cmd("makoctl restore"))
+
+-- Alterna o modo Não Perturbe (Do Not Disturb) com aviso visual
+hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd([[sh -c 'if makoctl mode | grep -q "dnd"; then makoctl mode -r dnd && notify-send -u low -t 2000 "Notificações" "Modo normal ativado"; else notify-send -u low -t 1500 "Notificações" "Não Perturbe ativado" && sleep 1.6 && makoctl mode -a dnd; fi']]))
+
 
 -- Foco nas janelas
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
