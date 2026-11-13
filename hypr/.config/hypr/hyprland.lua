@@ -78,7 +78,7 @@ hl.config({
     },
 
     misc = {
---        vfr                      = true,  -- ESSENCIAL: Reduz CPU/GPU para 0% em tela parada
+--NÃO FUNCIONA        vfr                      = true,  -- ESSENCIAL: Reduz CPU/GPU para 0% em tela parada
         vrr                      = 1,     -- 1 = Ativado (FreeSync / G-Sync)
 disable_hyprland_logo    = true,
 disable_splash_rendering = true,
@@ -112,17 +112,21 @@ force_default_wallpaper  = 0,
 local mainMod = "SUPER"
 
 -- Execução de programas
-hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + C", hl.dsp.window.close())
-hl.bind(mainMod .. " + M", hl.dsp.exit()) -- Corrigido: chamada nativa sem passar por hyprctl
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
-hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
-hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy"))
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("pkill hyprsunset || hyprsunset --temperature 4000"))
+hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal)) -- abre o terminal
+hl.bind(mainMod .. " + C", hl.dsp.window.close()) -- fecha a janela ativa
+hl.bind(mainMod .. " + M", hl.dsp.exit()) -- desligamento direto, chamada nativa sem passar por hyprctl
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager)) -- abre o gerenciador de arquivos no workspace específico pra isso.
+hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" })) -- alterna a janela ativa entre flutuante e fixa
+
+-- Lançador de aplicativos (SUPER + D ou SUPER + Espaço)
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("fuzzel"))
+--hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu)) -- abre o menu de aplicativos/programas
+
+hl.bind(mainMod .. " + P", hl.dsp.window.pseudo()) -- ainda não sei o que faz
+hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- não sei o que faz
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock")) -- bloqueia a sessão
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy")) -- histórco de ctrl+C (100)
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("pkill hyprsunset || hyprsunset --temperature 4000")) -- alterna a temperatura de cor da tela
 
 -- OCR da tela direto para o clipboard (Português + Inglês)
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd([[grim -g "$(slurp)" - | tesseract stdin stdout -l por+eng | tr -d '\f' | wl-copy]]))
@@ -131,13 +135,10 @@ hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd([[grim -g "$(slurp)" - | tess
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
 
 -- Print (sem modificador): seleciona área e copia para o clipboard
-hl.bind("Print", hl.dsp.exec_cmd([[sh -c 'grim -g "$(slurp)" - | wl-copy']]))
+hl.bind("Print", hl.dsp.exec_cmd([[sh -c 'grim -g "$(slurp)" - | wl-copy']])) -- usa a tecla PrintScreen pra fazer um print
 
 -- SHIFT + Print: tela inteira salva na pasta Imagens
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd([[sh -c 'grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']]))
-
--- Lançador de aplicativos (SUPER + D ou SUPER + Espaço)
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("fuzzel"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd([[sh -c 'grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']])) -- parece não funcionar
 
 -- Menu de desligamento / encerramento (SUPER + Escape ou SUPER + Backspace)
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
@@ -192,6 +193,22 @@ end
     -- 4. ARQUIVOS
     hl.bind(mainMod .. " + F",         hl.dsp.focus({ workspace = "name:arquivos" }))
     hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.move({ workspace = "name:arquivos" }))
+
+    -- ==========================================
+    -- MOVER JANELAS SILENCIOSAMENTE (ALT)
+    -- ==========================================
+
+    -- 1. Workspaces numerados (1 a 10)
+    for i = 1, 10 do
+        local key = tostring(i % 10) -- O workspace 10 usa a tecla "0"
+        hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.window.move({ workspace = i, silent = true }))
+        end
+
+        -- 2. Workspaces nomeados dedicados
+        hl.bind(mainMod .. " + ALT + T",        hl.dsp.window.move({ workspace = "name:terminal", silent = true }))
+        hl.bind(mainMod .. " + ALT + A",        hl.dsp.window.move({ workspace = "name:agenda",   silent = true }))
+        hl.bind(mainMod .. " + ALT + CTRL + E", hl.dsp.window.move({ workspace = "name:email",    silent = true }))
+        hl.bind(mainMod .. " + ALT + F",        hl.dsp.window.move({ workspace = "name:arquivos", silent = true }))
 
     -- ==========================================
     -- 7. REGRAS DE JANELAS
