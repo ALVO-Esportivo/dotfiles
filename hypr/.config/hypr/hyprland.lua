@@ -147,6 +147,19 @@ hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
 -- SUPER + H: lista todos os atalhos configurados no Fuzzel
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd([[sh -c 'grep -E "hl\.bind\(" ~/.config/hypr/hyprland.lua | fuzzel --dmenu -w 80']]))
 
+-- ALT + Tab: avança para a próxima janela do workspace atual
+hl.bind("ALT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext ; dispatch bringactivetotop"]]))
+
+-- ALT + SHIFT + Tab: retorna para a janela anterior
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext prev ; dispatch bringactivetotop"]]))
+
+-- SUPER + Tab: alterna instantaneamente com o último workspace utilizado
+hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprctl dispatch workspace previous"))
+
+-- SUPER + W: lista todas as janelas abertas e salta direto para a escolhida
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch focuswindow "address:$addr"']]))
+
+
 -- Foco nas janelas
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
