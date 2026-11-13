@@ -144,6 +144,9 @@ hl.bind("SHIFT + Print", hl.dsp.exec_cmd([[sh -c 'grim "$HOME/Imagens/screenshot
 -- Menu de desligamento / encerramento (SUPER + Escape ou SUPER + Backspace)
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
 
+-- SUPER + H: lista todos os atalhos configurados no Fuzzel
+hl.bind(mainMod .. " + H", hl.dsp.exec_cmd([[sh -c 'grep -E "hl\.bind\(" ~/.config/hypr/hyprland.lua | fuzzel --dmenu -w 80']]))
+
 -- Foco nas janelas
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
