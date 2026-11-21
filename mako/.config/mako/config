@@ -2,12 +2,12 @@
 font=monospace 10
 width=320
 height=120
-margin=10
+margin=5
 padding=12
 border-size=2
-border-radius=6
+border-radius=1
 max-visible=3
-max-history=10
+max-history=15
 sort=-time
 
 # Posicionamento (canto superior direito, logo abaixo da Waybar)

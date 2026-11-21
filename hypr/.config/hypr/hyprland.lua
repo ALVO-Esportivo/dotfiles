@@ -247,6 +247,9 @@ end
         -- Envia a janela atual para o próximo workspace vazio sem sair da tela
         hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("hyprctl dispatch movetoworkspacesilent empty"))
 
+
+
+
     -- ==========================================
     -- 7. REGRAS DE JANELAS
     -- ==========================================
