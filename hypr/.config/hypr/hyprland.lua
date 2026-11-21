@@ -11,24 +11,23 @@ hl.monitor({
 -- ==========================================
 -- 2. PROGRAMAS PADRÃO (STACK LEVE)
 -- ==========================================
-local terminal    = "footclient"      -- Mais leve que kitty (mude para kitty se preferir)
-local fileManager = "thunar"    -- Mais leve que dolphin (evita daemons do KDE)
-local menu        = "fuzzel"    -- Mais leve que wofi
+local terminal    = "footclient"
+local fileManager = "thunar"
+local menu        = "fuzzel"
 
 -- ==========================================
 -- 3. AUTOSTART
 -- ==========================================
 hl.on("hyprland.start", function()
-hl.exec_cmd("waybar")       -- Apenas uma instância
+hl.exec_cmd("waybar")
 hl.exec_cmd("mako")
 hl.exec_cmd("hypridle")
 hl.exec_cmd("foot --server")
 hl.exec_cmd("systemctl --user start hyprpolkitagent")
 
--- monitora texto e imagens copiadas
+-- Monitora texto e imagens copiadas
 hl.exec_cmd("wl-paste --type text --watch cliphist store")
 hl.exec_cmd("wl-paste --type image --watch cliphist store")
-
 end)
 
 -- ==========================================
@@ -41,10 +40,10 @@ hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("CLUTTER_BACKEND", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
-hl.env("LIBVA_DRIVER_NAME", "iHD") -- Driver Intel nativo
+hl.env("LIBVA_DRIVER_NAME", "iHD")
 
 -- ==========================================
--- 5. CONFIGURAÇÃO UNIFICADA (PERFORMANCE MÁXIMA)
+-- 5. CONFIGURAÇÃO UNIFICADA (PERFORMANCE)
 -- ==========================================
 hl.config({
     general = {
@@ -52,8 +51,8 @@ hl.config({
         gaps_out         = 0,
         border_size      = 1,
         col = {
-            active_border   = "rgba(33ccffee)", -- Cor sólida evita gradientes caros
-            inactive_border = "rgba(595959aa)",
+            active_border   = "rgba(33ccffee)",
+          inactive_border = "rgba(595959aa)",
         },
         resize_on_border = true,
         allow_tearing    = false,
@@ -64,7 +63,6 @@ hl.config({
         rounding         = 0,
         active_opacity   = 1.0,
         inactive_opacity = 1.0,
-
         shadow = {
             enabled = false,
         },
@@ -78,13 +76,12 @@ hl.config({
     },
 
     misc = {
---NÃO FUNCIONA        vfr                      = true,  -- ESSENCIAL: Reduz CPU/GPU para 0% em tela parada
-        vrr                      = 1,     -- 1 = Ativado (FreeSync / G-Sync)
-disable_hyprland_logo    = true,
-disable_splash_rendering = true,
-mouse_move_enables_dpms  = true,
-key_press_enables_dpms   = true,
-force_default_wallpaper  = 0,
+        vrr                      = 1,
+        disable_hyprland_logo    = true,
+        disable_splash_rendering = true,
+        mouse_move_enables_dpms  = true,
+        key_press_enables_dpms   = true,
+        force_default_wallpaper  = 0,
     },
 
     dwindle = {
@@ -111,251 +108,204 @@ force_default_wallpaper  = 0,
 -- ==========================================
 local mainMod = "SUPER"
 
--- Execução de programas
-hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal)) -- abre o terminal
-hl.bind(mainMod .. " + C", hl.dsp.window.close()) -- fecha a janela ativa
-hl.bind(mainMod .. " + M", hl.dsp.exit()) -- desligamento direto, chamada nativa sem passar por hyprctl
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager)) -- abre o gerenciador de arquivos no workspace específico pra isso.
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" })) -- alterna a janela ativa entre flutuante e fixa
+-- Aplicativos e Janelas
+hl.bind(mainMod .. " + Q",         hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + E",         hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + D",         hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + C",         hl.dsp.window.close())
+hl.bind(mainMod .. " + V",         hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + P",         hl.dsp.window.pseudo())      -- Mantém tamanho original da janela dentro do tiling
+hl.bind(mainMod .. " + J",         hl.dsp.layout("togglesplit")) -- Alterna divisão entre vertical e horizontal
+hl.bind(mainMod .. " + L",         hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + M",         hl.dsp.exit())
+hl.bind(mainMod .. " + Escape",    hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
+hl.bind(mainMod .. " + B",         hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
 
--- Lançador de aplicativos (SUPER + D ou SUPER + Espaço)
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("fuzzel"))
---hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu)) -- abre o menu de aplicativos/programas
-
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo()) -- ainda não sei o que faz
-hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- não sei o que faz
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock")) -- bloqueia a sessão
-hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy")) -- histórco de ctrl+C (100)
-
---hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("pkill hyprsunset || hyprsunset --temperature 4000")) -- alterna a temperatura de cor da tela
-
--- OCR da tela direto para o clipboard (Português + Inglês)
+-- Histórico de Clipboard, Consulta de Atalhos e OCR
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy"))
+hl.bind(mainMod .. " + H",         hl.dsp.exec_cmd([[sh -c 'grep -E "hl\.bind\(" ~/.config/hypr/hyprland.lua | fuzzel --dmenu -w 80']]))
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd([[grim -g "$(slurp)" - | tesseract stdin stdout -l por+eng | tr -d '\f' | wl-copy]]))
 
--- Alternar visibilidade do Waybar (Modo Foco)
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
+-- Capturas de Tela (Área no clipboard / Tela cheia em ~/Imagens)
+hl.bind("Print",           hl.dsp.exec_cmd([[sh -c 'grim -g "$(slurp)" - | wl-copy']]))
+hl.bind("SHIFT + Print",   hl.dsp.exec_cmd([[sh -c 'mkdir -p "$HOME/Imagens" && grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']]))
+hl.bind("SHIFT + Sys_Req", hl.dsp.exec_cmd([[sh -c 'mkdir -p "$HOME/Imagens" && grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']]))
 
--- Print (sem modificador): seleciona área e copia para o clipboard
-hl.bind("Print", hl.dsp.exec_cmd([[sh -c 'grim -g "$(slurp)" - | wl-copy']])) -- usa a tecla PrintScreen pra fazer um print
-
--- SHIFT + Print: tela inteira salva na pasta Imagens
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd([[sh -c 'grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']])) -- parece não funcionar
-
--- Menu de desligamento / encerramento (SUPER + Escape ou SUPER + Backspace)
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
-
--- SUPER + H: lista todos os atalhos configurados no Fuzzel
-hl.bind(mainMod .. " + H", hl.dsp.exec_cmd([[sh -c 'grep -E "hl\.bind\(" ~/.config/hypr/hyprland.lua | fuzzel --dmenu -w 80']]))
-
--- ALT + Tab: avança para a próxima janela do workspace atual
-hl.bind("ALT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext ; dispatch bringactivetotop"]]))
-
--- ALT + SHIFT + Tab: retorna para a janela anterior
+-- Alternância de Janelas e Workspaces (Tab e Fuzzel)
+hl.bind("ALT + Tab",         hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext ; dispatch bringactivetotop"]]))
 hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext prev ; dispatch bringactivetotop"]]))
-
--- SUPER + Tab: alterna instantaneamente com o último workspace utilizado
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprctl dispatch workspace previous"))
+hl.bind(mainMod .. " + W",   hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch focuswindow "address:$addr"']]))
 
--- SUPER + W: lista todas as janelas abertas e salta direto para a escolhida
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch focuswindow "address:$addr"']]))
-
--- ==========================================
--- NOTIFICAÇÕES (MAKO)
--- ==========================================
--- Dispensa a notificação atual / todas as notificações
+-- Notificações (Mako)
 hl.bind(mainMod .. " + BackSpace",         hl.dsp.exec_cmd("makoctl dismiss"))
 hl.bind(mainMod .. " + SHIFT + BackSpace", hl.dsp.exec_cmd("makoctl dismiss -a"))
-
--- Restaura a última notificação dispensada (histórico)
 hl.bind(mainMod .. " + CTRL + BackSpace",  hl.dsp.exec_cmd("makoctl restore"))
+hl.bind(mainMod .. " + SHIFT + D",         hl.dsp.exec_cmd([[sh -c 'if makoctl mode | grep -q "dnd"; then makoctl mode -r dnd && notify-send -u low -t 2000 "Notificações" "Modo normal ativado"; else notify-send -u low -t 1500 "Notificações" "Não Perturbe ativado" && sleep 1.6 && makoctl mode -a dnd; fi']]))
 
--- Alterna o modo Não Perturbe (Do Not Disturb) com aviso visual
-hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd([[sh -c 'if makoctl mode | grep -q "dnd"; then makoctl mode -r dnd && notify-send -u low -t 2000 "Notificações" "Modo normal ativado"; else notify-send -u low -t 1500 "Notificações" "Não Perturbe ativado" && sleep 1.6 && makoctl mode -a dnd; fi']]))
-
-
--- Foco nas janelas
+-- Foco nas Janelas (Setas)
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
+-- Mouse (Mover e Redimensionar Flutuantes)
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Workspaces de 1 a 10:
--- SUPER + [1-9,0]         -> Foca a workspace
--- SUPER + SHIFT + [1-9,0] -> Move a janela ativa e vai junto
--- SUPER + ALT + [1-9,0]  -> Envia a janela para lá silenciosamente (você fica onde está)
+-- Controles Multimídia e Brilho
+hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
+hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+
+-- ==========================================
+-- 7. WORKSPACES (1-10, 11-20, NOVO E FIXOS)
+-- ==========================================
+
+-- Workspaces 1 a 10
 for i = 1, 10 do
-    local key = i % 10
-    hl.bind(mainMod .. " + " .. key,                hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key,        hl.dsp.window.move({ workspace = i }))
-    hl.bind(mainMod .. " + ALT + " .. key,         hl.dsp.window.move({ workspace = i, silent = true }))
-end
+    local key = tostring(i % 10)
+    hl.bind(mainMod .. " + " .. key,           hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. key,   hl.dsp.window.move({ workspace = i }))
+    hl.bind(mainMod .. " + ALT + " .. key,     hl.dsp.window.move({ workspace = i, silent = true }))
+    end
 
--- Janelas flutuantes com o Mouse
-    hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
-    hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+    -- Workspaces 11 a 20 (Modificador CTRL)
+for i = 1, 10 do
+    local key = tostring(i % 10)
+    local ws  = i + 10
+    hl.bind(mainMod .. " + CTRL + " .. key,         hl.dsp.focus({ workspace = ws }))
+    hl.bind(mainMod .. " + CTRL + SHIFT + " .. key, hl.dsp.window.move({ workspace = ws }))
+    hl.bind(mainMod .. " + CTRL + ALT + " .. key,   hl.dsp.window.move({ workspace = ws, silent = true }))
+    end
+--[ESSE BLOCO ABAIXO NÃO FUNCIONA]
+-- Criar novo workspace sempre além do maior aberto (ex: 11, 12...)
+hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd([[sh -c 'next=$(hyprctl workspaces -j | jq "[.[].id | select(. > 0)] | (max // 0) + 1"); hyprctl dispatch workspace "$next"']]))
+hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd([[sh -c 'next=$(hyprctl workspaces -j | jq "[.[].id | select(. > 0)] | (max // 0) + 1"); hyprctl dispatch movetoworkspacesilent "$next"']]))
+-- Criar novo workspace sempre além do maior aberto (ex: 11, 12...)
+hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd([[sh -c 'hyprctl dispatch workspace $(hyprctl workspaces | awk "/^workspace ID [0-9]+ / {if (\$3>m) m=\$3} END {print m+1}")']]))
+hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd([[sh -c 'hyprctl dispatch movetoworkspacesilent $(hyprctl workspaces | awk "/^workspace ID [0-9]+ / {if (\$3>m) m=\$3} END {print m+1}")']]))
+--[ESSE BLOCO ACIMA NÃO FUNCIONA]
 
--- Controles multimídia
-    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-    hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
-    hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-    hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-    hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+-- Workspaces Dedicados (Nomeados)
+-- 1. Terminal
+hl.bind(mainMod .. " + T",         hl.dsp.focus({ workspace = "name:terminal" }))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.move({ workspace = "name:terminal" }))
+hl.bind(mainMod .. " + ALT + T",   hl.dsp.window.move({ workspace = "name:terminal", silent = true }))
 
+-- 2. Agenda
+hl.bind(mainMod .. " + A",         hl.dsp.focus({ workspace = "name:agenda" }))
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.window.move({ workspace = "name:agenda" }))
+hl.bind(mainMod .. " + ALT + A",   hl.dsp.window.move({ workspace = "name:agenda", silent = true }))
 
-    -- ==========================================
-    -- WORKSPACES DEDICADAS
-    -- ==========================================
+-- 3. E-mail
+hl.bind(mainMod .. " + ALT + E",         hl.dsp.focus({ workspace = "name:email" }))
+hl.bind(mainMod .. " + ALT + SHIFT + E", hl.dsp.window.move({ workspace = "name:email" }))
+hl.bind(mainMod .. " + ALT + CTRL + E",  hl.dsp.window.move({ workspace = "name:email", silent = true }))
 
-    -- 1. TERMINAL
-    hl.bind(mainMod .. " + T",         hl.dsp.focus({ workspace = "name:terminal" }))
-    hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.move({ workspace = "name:terminal" }))
+-- 4. Arquivos
+hl.bind(mainMod .. " + F",         hl.dsp.focus({ workspace = "name:arquivos" }))
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.move({ workspace = "name:arquivos" }))
+hl.bind(mainMod .. " + ALT + F",   hl.dsp.window.move({ workspace = "name:arquivos", silent = true }))
 
-    -- 2. AGENDA
-    hl.bind(mainMod .. " + A",         hl.dsp.focus({ workspace = "name:agenda" }))
-    hl.bind(mainMod .. " + SHIFT + A", hl.dsp.window.move({ workspace = "name:agenda" }))
+-- ==========================================
+-- 8. REGRAS DE JANELAS
+-- ==========================================
+hl.window_rule({
+    name           = "suppress-maximize-events",
+    match          = { class = ".*" },
+    suppress_event = "maximize",
+})
 
-    -- 3. E-MAIL
-    hl.bind(mainMod .. " + ALT + E",         hl.dsp.focus({ workspace = "name:email" }))
-    hl.bind(mainMod .. " + ALT + SHIFT + E", hl.dsp.window.move({ workspace = "name:email" }))
+hl.window_rule({
+    name  = "fix-xwayland-drags",
+    match = {
+        class      = "^$",
+        title      = "^$",
+        xwayland   = true,
+        float      = true,
+        fullscreen = false,
+        pin        = false,
+    },
+    no_focus = true,
+})
 
-    -- 4. ARQUIVOS
-    hl.bind(mainMod .. " + F",         hl.dsp.focus({ workspace = "name:arquivos" }))
-    hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.move({ workspace = "name:arquivos" }))
+-- Aplicativos fixos nos seus workspaces nomeados
+hl.window_rule({
+    name      = "auto-email-workspace",
+    match     = { class = "thunderbird" },
+    workspace = "name:email",
+})
 
-    -- ==========================================
-    -- MOVER JANELAS SILENCIOSAMENTE (ALT)
-    -- ==========================================
+hl.window_rule({
+    name      = "auto-agenda-workspace",
+    match     = { class = "org.gnome.Calendar" },
+    workspace = "name:agenda",
+})
 
-    -- 1. Workspaces numerados (1 a 10)
-    for i = 1, 10 do
-        local key = tostring(i % 10) -- O workspace 10 usa a tecla "0"
-        hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.window.move({ workspace = i, silent = true }))
-        end
+hl.window_rule({
+    name      = "auto-arquivos-workspace",
+    match     = { class = "thunar" },
+    workspace = "name:arquivos",
+})
 
-        -- 2. Workspaces nomeados dedicados
-        hl.bind(mainMod .. " + ALT + T",        hl.dsp.window.move({ workspace = "name:terminal", silent = true }))
-        hl.bind(mainMod .. " + ALT + A",        hl.dsp.window.move({ workspace = "name:agenda",   silent = true }))
-        hl.bind(mainMod .. " + ALT + CTRL + E", hl.dsp.window.move({ workspace = "name:email",    silent = true }))
-        hl.bind(mainMod .. " + ALT + F",        hl.dsp.window.move({ workspace = "name:arquivos", silent = true }))
+-- Terminal sempre flutuante
+hl.window_rule({
+    name  = "floating-terminal",
+    match = { class = "^(foot|footclient)$" },
+               float = true,
+})
 
--- JANELAS ACIMA DE 10
-        -- Pula para o próximo workspace vazio disponível (ex: 11, 12...)
-        hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("hyprctl dispatch workspace empty"))
+-- Picture-in-Picture (Navegadores)
+hl.window_rule({
+    name              = "pip-floating",
+    match             = { title = "^(Picture-in-Picture|Imagem sobre imagem)$" },
+               float             = true,
+               pin               = true,
+               keep_aspect_ratio = true,
+})
 
-        -- Envia a janela atual para o próximo workspace vazio sem sair da tela
-        hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("hyprctl dispatch movetoworkspacesilent empty"))
+-- Diálogos do VS Code
+hl.window_rule({
+    name  = "vscode-dialogs",
+    match = {
+        class = "^(code|Code|code-oss)$",
+               title = "^(Open Folder|Open File|Save As|Workspace Trust)$",
+    },
+    float  = true,
+    center = true,
+})
 
+-- Caixas de diálogo por título (Português e Inglês)
+hl.window_rule({
+    name  = "floating-dialogs-by-title",
+    match = {
+        title = "^(Abrir.*|Salvar.*|Confirmar.*|Selecionar.*|Escolher.*|Open.*|Save.*|Confirm.*|Select.*|Choose.*|File Upload.*|Preferences.*|Settings.*|Propriedades.*|Properties.*|Workspace Trust.*)$",
+    },
+    float  = true,
+    center = true,
+})
 
+-- Portais Wayland e utilitários rápidos
+hl.window_rule({
+    name  = "floating-dialogs-by-class",
+    match = {
+        class = "^(xdg-desktop-portal.*|hyprpolkitagent|org.kde.polkit-kde-authentication-agent-1|pavucontrol|nm-connection-editor|blueman-manager|file-roller)$",
+    },
+    float  = true,
+    center = true,
+})
 
-
-    -- ==========================================
-    -- 7. REGRAS DE JANELAS
-    -- ==========================================
-    hl.window_rule({
-        name           = "suppress-maximize-events",
-        match          = { class = ".*" },
-        suppress_event = "maximize",
-    })
-
-    hl.window_rule({
-        name  = "fix-xwayland-drags",
-        match = {
-            class      = "^$",
-            title      = "^$",
-            xwayland   = true,
-            float      = true,
-            fullscreen = false,
-            pin        = false,
-        },
-        no_focus = true,
-    })
-
-    -- Abre o Thunderbird diretamente na workspace especial de email
-    hl.window_rule({
-        name      = "auto-email-scratchpad",
-        match     = { class = "thunderbird" },
-        workspace = "special:email",
-    })
-
-    -- Abre janelas com classe 'calendar' diretamente na agenda
-    hl.window_rule({
-        name      = "auto-agenda-scratchpad",
-        match     = { class = "org.gnome.Calendar" },
-        workspace = "special:agenda",
-    })
-
-    -- Abre o Gerenciador de Arquivos no workspace de Arquivos
-    hl.window_rule({
-        name      = "auto-arquivos-workspace",
-        match     = { class = "thunar" },
-        workspace = "name:arquivos",
-    })
-
-    -- Regra para Picture-in-Picture automático (Firefox e navegadores Chromium)
-    hl.window_rule({
-        name      = "pip-floating",
-        match     = { title = "^(Picture-in-Picture|Imagem sobre imagem)$" },
-                   float     = true,
-                   pin       = true, -- Permanece visível mesmo trocando de workspace
-                   keep_aspect_ratio = true,
-    })
-
-    -- Garante que janelas de diálogo do VS Code abram centralizadas e flutuantes
-    hl.window_rule({
-        name  = "vscode-dialogs",
-        match = {
-            class = "^(code|Code|code-oss)$",
-                   title = "^(Open Folder|Open File|Save As|Workspace Trust)$",
-        },
-        float  = true,
-        center = true,
-    })
-
-    -- ==========================================
-    -- CAIXAS DE DIÁLOGO E POPUPS FLUTUANTES
-    -- ==========================================
-
-    -- 1. Captura caixas de diálogo por títulos comuns (Inglês e Português)
-    hl.window_rule({
-        name  = "floating-dialogs-by-title",
-        match = {
-            title = "^(Abrir.*|Salvar.*|Confirmar.*|Selecionar.*|Escolher.*|Open.*|Save.*|Confirm.*|Select.*|Choose.*|File Upload.*|Preferences.*|Settings.*|Propriedades.*|Properties.*|Workspace Trust.*)$",
-        },
-        float  = true,
-        center = true,
-    })
-
-    -- 2. Portais nativos do Wayland, autenticação e utilitários rápidos
-    hl.window_rule({
-        name  = "floating-dialogs-by-class",
-        match = {
-            class = "^(xdg-desktop-portal.*|hyprpolkitagent|org.kde.polkit-kde-authentication-agent-1|pavucontrol|nm-connection-editor|blueman-manager|file-roller)$",
-        },
-        float  = true,
-        center = true,
-    })
-
-    hl.window_rule({
-        name  = "floating-dialogs-sized",
-        match = {
-            title = "^(Abrir.*|Salvar.*|Open.*|Save.*)$",
-        },
-        float  = true,
-        center = true,
-        size   = "850 550", -- Largura e Altura em pixels
-    })
-
-    -- ==========================================
-    -- TERMINAL SEMPRE FLUTUANTE
-    -- ==========================================
-    hl.window_rule({
-        name  = "floating-terminal",
-        match = {
-            class = "^(foot|footclient)$",
-        },
-        float = true,
-    })
-
-
+-- Tamanho padrão para diálogos de abrir/salvar
+hl.window_rule({
+    name  = "floating-dialogs-sized",
+    match = {
+        title = "^(Abrir.*|Salvar.*|Open.*|Save.*)$",
+    },
+    float  = true,
+    center = true,
+    size   = "850 550",
+})
