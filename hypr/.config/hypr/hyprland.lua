@@ -165,6 +165,50 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"
 -- 7. WORKSPACES (1-10, 11-20, NOVO E FIXOS)
 -- ==========================================
 
+--TESTE
+-- Workspaces 1 a 10
+for i = 1, 10 do
+    local key = tostring(i % 10)
+    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+    hl.bind(mainMod .. " + ALT + " .. key,   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', ]] .. i .. [["]]))
+    end
+
+    -- Workspaces 11 a 20 (Modificador CTRL)
+for i = 1, 10 do
+    local key = tostring(i % 10)
+    local ws  = i + 10
+    hl.bind(mainMod .. " + CTRL + " .. key,         hl.dsp.focus({ workspace = ws }))
+    hl.bind(mainMod .. " + CTRL + SHIFT + " .. key, hl.dsp.window.move({ workspace = ws }))
+    hl.bind(mainMod .. " + CTRL + ALT + " .. key,   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', ]] .. ws .. [["]]))
+    end
+
+    -- Criar novo workspace sempre além do maior aberto (ex: 11, 12...)
+hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd("~/.config/hypr/scripts/next-workspace.sh"))
+hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("~/.config/hypr/scripts/next-workspace.sh silent"))
+
+-- Workspaces Dedicados (Nomeados)
+-- 1. Terminal
+hl.bind(mainMod .. " + T",         hl.dsp.focus({ workspace = "name:terminal" }))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.move({ workspace = "name:terminal" }))
+hl.bind(mainMod .. " + ALT + T",   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:terminal'"]]))
+
+-- 2. Agenda
+hl.bind(mainMod .. " + A",         hl.dsp.focus({ workspace = "name:agenda" }))
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.window.move({ workspace = "name:agenda" }))
+hl.bind(mainMod .. " + ALT + A",   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:agenda'"]]))
+
+-- 3. E-mail
+hl.bind(mainMod .. " + ALT + E",         hl.dsp.focus({ workspace = "name:email" }))
+hl.bind(mainMod .. " + ALT + SHIFT + E", hl.dsp.window.move({ workspace = "name:email" }))
+hl.bind(mainMod .. " + ALT + CTRL + E",  hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:email'"]]))
+
+-- 4. Arquivos
+hl.bind(mainMod .. " + F",         hl.dsp.focus({ workspace = "name:arquivos" }))
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.move({ workspace = "name:arquivos" }))
+hl.bind(mainMod .. " + ALT + F",   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:arquivos'"]]))
+--TESTE
+
 -- Workspaces 1 a 10
 for i = 1, 10 do
     local key = tostring(i % 10)
@@ -189,6 +233,13 @@ hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd([[sh -c 'next=$(hyprctl workspa
 hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd([[sh -c 'hyprctl dispatch workspace $(hyprctl workspaces | awk "/^workspace ID [0-9]+ / {if (\$3>m) m=\$3} END {print m+1}")']]))
 hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd([[sh -c 'hyprctl dispatch movetoworkspacesilent $(hyprctl workspaces | awk "/^workspace ID [0-9]+ / {if (\$3>m) m=\$3} END {print m+1}")']]))
 --[ESSE BLOCO ACIMA NÃO FUNCIONA]
+
+-- Alternância de Janelas e Workspaces (Tab e Fuzzel)
+hl.bind("ALT + Tab",         hl.dsp.exec_cmd([[hyprctl --batch "dispatch 'cyclenext' ; dispatch 'bringactivetotop'"]]))
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch 'cyclenext', 'prev' ; dispatch 'bringactivetotop'"]]))
+hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd([[hyprctl dispatch "'workspace', 'previous'"]]))
+hl.bind(mainMod .. " + W",   hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch "$(printf "\x27focuswindow\x27, \x27address:%s\x27" "$addr")"']]))
+
 
 -- Workspaces Dedicados (Nomeados)
 -- 1. Terminal
