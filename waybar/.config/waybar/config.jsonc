@@ -97,10 +97,17 @@
     },
 
     "custom/gpu": {
-        "interval": 5,
+        "interval": 10,
         "exec": "cat /sys/class/drm/card1/gt_act_freq_mhz",
         "format": "<span color=\"#7f849c\">GPU</span> {}MHz",
         "tooltip": false
+    },
+    "custom/shortcuts": {
+        "format": "<span color=\"#7f849c\">Atalhos</span> {}",
+        "exec": "/home/devianna/dotfiles/hypr/.config/hypr/scripts/hyprland-shortcuts-bar.sh",
+        "interval": 60,
+        "on-click": "/home/devianna/dotfiles/hypr/.config/hypr/scripts/hyprland-shortcuts.sh",
+        "tooltip": "Mostrar atalhos do Hyprland"
     },
 
     "memory": {

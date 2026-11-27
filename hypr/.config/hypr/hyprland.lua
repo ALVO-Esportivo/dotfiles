@@ -14,20 +14,21 @@ hl.monitor({
 local terminal    = "footclient"
 local fileManager = "thunar"
 local menu        = "fuzzel"
+local mainMod     = "SUPER"
 
 -- ==========================================
 -- 3. AUTOSTART
 -- ==========================================
 hl.on("hyprland.start", function()
-hl.exec_cmd("waybar")
-hl.exec_cmd("mako")
-hl.exec_cmd("hypridle")
-hl.exec_cmd("foot --server")
-hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("mako")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("foot --server")
+    hl.exec_cmd("systemctl --user start hyprpolkitagent")
 
--- Monitora texto e imagens copiadas
-hl.exec_cmd("wl-paste --type text --watch cliphist store")
-hl.exec_cmd("wl-paste --type image --watch cliphist store")
+    -- Monitora texto e imagens copiados para o clipboard.
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
 end)
 
 -- ==========================================
@@ -40,10 +41,13 @@ hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("CLUTTER_BACKEND", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
-hl.env("LIBVA_DRIVER_NAME", "iHD")
+
+-- Não force LIBVA_DRIVER_NAME aqui. A HD 4000 (Ivy Bridge/Gen 7) usa o
+-- driver VA-API legado i965, não iHD. Deixe o libva detectar o driver;
+-- se precisar forçar i965, instale antes o pacote libva-intel-driver.
 
 -- ==========================================
--- 5. CONFIGURAÇÃO UNIFICADA (PERFORMANCE)
+-- 5. CONFIGURAÇÃO (LEVE PARA A INTEL HD 4000)
 -- ==========================================
 hl.config({
     general = {
@@ -52,7 +56,7 @@ hl.config({
         border_size      = 1,
         col = {
             active_border   = "rgba(33ccffee)",
-          inactive_border = "rgba(595959aa)",
+            inactive_border = "rgba(595959aa)",
         },
         resize_on_border = true,
         allow_tearing    = false,
@@ -76,7 +80,8 @@ hl.config({
     },
 
     misc = {
-        vrr                      = 1,
+        vrr                      = 0, -- O painel LVDS-1 não suporta VRR.
+        -- O VFR já fica ativo por padrão; não o configure dentro de misc.
         disable_hyprland_logo    = true,
         disable_splash_rendering = true,
         mouse_move_enables_dpms  = true,
@@ -106,35 +111,34 @@ hl.config({
 -- ==========================================
 -- 6. ATALHOS DE TECLADO
 -- ==========================================
-local mainMod = "SUPER"
 
--- Aplicativos e Janelas
-hl.bind(mainMod .. " + Q",         hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E",         hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + D",         hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + C",         hl.dsp.window.close())
-hl.bind(mainMod .. " + V",         hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + P",         hl.dsp.window.pseudo())      -- Mantém tamanho original da janela dentro do tiling
-hl.bind(mainMod .. " + J",         hl.dsp.layout("togglesplit")) -- Alterna divisão entre vertical e horizontal
-hl.bind(mainMod .. " + L",         hl.dsp.exec_cmd("hyprlock"))
-hl.bind(mainMod .. " + M",         hl.dsp.exit())
-hl.bind(mainMod .. " + Escape",    hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
-hl.bind(mainMod .. " + B",         hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
+-- Aplicativos e janelas
+hl.bind(mainMod .. " + Q",      hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + D",      hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + C",      hl.dsp.window.close())
+hl.bind(mainMod .. " + V",      hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + P",      hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + J",      hl.dsp.layout("togglesplit"))
+hl.bind(mainMod .. " + L",      hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("hyprctl dispatch dpms off"))
+hl.bind(mainMod .. " + M",      hl.dsp.exit())
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/powermenu.sh"))
+hl.bind(mainMod .. " + B",      hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
+hl.bind(mainMod .. " + CTRL + B", hl.dsp.exec_cmd("~/.config/hypr/scripts/hyprland-shortcuts.sh"))
 
--- Histórico de Clipboard, Consulta de Atalhos e OCR
-hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy"))
-hl.bind(mainMod .. " + H",         hl.dsp.exec_cmd([[sh -c 'grep -E "hl\.bind\(" ~/.config/hypr/hyprland.lua | fuzzel --dmenu -w 80']]))
+-- Histórico do clipboard, consulta de atalhos e OCR
+hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu -p 'Clipboard: ' | cliphist decode | wl-copy"))
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd([[grim -g "$(slurp)" - | tesseract stdin stdout -l por+eng | tr -d '\f' | wl-copy]]))
 
--- Capturas de Tela (Área no clipboard / Tela cheia em ~/Imagens)
+-- Capturas de tela: área no clipboard; tela inteira em ~/Imagens
 hl.bind("Print",           hl.dsp.exec_cmd([[sh -c 'grim -g "$(slurp)" - | wl-copy']]))
 hl.bind("SHIFT + Print",   hl.dsp.exec_cmd([[sh -c 'mkdir -p "$HOME/Imagens" && grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']]))
 hl.bind("SHIFT + Sys_Req", hl.dsp.exec_cmd([[sh -c 'mkdir -p "$HOME/Imagens" && grim "$HOME/Imagens/screenshot_$(date +%Y%m%d_%H%M%S).png"']]))
 
--- Alternância de Janelas e Workspaces (Tab e Fuzzel)
+-- Alternância de janelas e workspace anterior
 hl.bind("ALT + Tab",         hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext ; dispatch bringactivetotop"]]))
 hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch cyclenext prev ; dispatch bringactivetotop"]]))
-hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprctl dispatch workspace previous"))
 hl.bind(mainMod .. " + W",   hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch focuswindow "address:$addr"']]))
 
 -- Notificações (Mako)
@@ -143,17 +147,17 @@ hl.bind(mainMod .. " + SHIFT + BackSpace", hl.dsp.exec_cmd("makoctl dismiss -a")
 hl.bind(mainMod .. " + CTRL + BackSpace",  hl.dsp.exec_cmd("makoctl restore"))
 hl.bind(mainMod .. " + SHIFT + D",         hl.dsp.exec_cmd([[sh -c 'if makoctl mode | grep -q "dnd"; then makoctl mode -r dnd && notify-send -u low -t 2000 "Notificações" "Modo normal ativado"; else notify-send -u low -t 1500 "Notificações" "Não Perturbe ativado" && sleep 1.6 && makoctl mode -a dnd; fi']]))
 
--- Foco nas Janelas (Setas)
+-- Foco nas janelas
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
--- Mouse (Mover e Redimensionar Flutuantes)
+-- Mover e redimensionar janelas flutuantes com o mouse
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Controles Multimídia e Brilho
+-- Controles multimídia e brilho
 hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
 hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
@@ -162,102 +166,43 @@ hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
 
 -- ==========================================
--- 7. WORKSPACES (1-10, 11-20, NOVO E FIXOS)
+-- 7. WORKSPACES
 -- ==========================================
 
---TESTE
--- Workspaces 1 a 10
+-- Workspaces 1 a 10 (Super+1...0); Alt move para o workspace sem trocar.
 for i = 1, 10 do
     local key = tostring(i % 10)
-    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + " .. key,        hl.dsp.focus({ workspace = i }))
     hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
-    hl.bind(mainMod .. " + ALT + " .. key,   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', ]] .. i .. [["]]))
-    end
+    hl.bind(mainMod .. " + ALT + " .. key,   hl.dsp.window.move({ workspace = i, silent = true }))
+end
 
-    -- Workspaces 11 a 20 (Modificador CTRL)
-for i = 1, 10 do
-    local key = tostring(i % 10)
-    local ws  = i + 10
-    hl.bind(mainMod .. " + CTRL + " .. key,         hl.dsp.focus({ workspace = ws }))
-    hl.bind(mainMod .. " + CTRL + SHIFT + " .. key, hl.dsp.window.move({ workspace = ws }))
-    hl.bind(mainMod .. " + CTRL + ALT + " .. key,   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', ]] .. ws .. [["]]))
-    end
-
-    -- Criar novo workspace sempre além do maior aberto (ex: 11, 12...)
-hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd("~/.config/hypr/scripts/next-workspace.sh"))
-hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd("~/.config/hypr/scripts/next-workspace.sh silent"))
-
--- Workspaces Dedicados (Nomeados)
--- 1. Terminal
-hl.bind(mainMod .. " + T",         hl.dsp.focus({ workspace = "name:terminal" }))
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.move({ workspace = "name:terminal" }))
-hl.bind(mainMod .. " + ALT + T",   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:terminal'"]]))
-
--- 2. Agenda
-hl.bind(mainMod .. " + A",         hl.dsp.focus({ workspace = "name:agenda" }))
-hl.bind(mainMod .. " + SHIFT + A", hl.dsp.window.move({ workspace = "name:agenda" }))
-hl.bind(mainMod .. " + ALT + A",   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:agenda'"]]))
-
--- 3. E-mail
-hl.bind(mainMod .. " + ALT + E",         hl.dsp.focus({ workspace = "name:email" }))
-hl.bind(mainMod .. " + ALT + SHIFT + E", hl.dsp.window.move({ workspace = "name:email" }))
-hl.bind(mainMod .. " + ALT + CTRL + E",  hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:email'"]]))
-
--- 4. Arquivos
-hl.bind(mainMod .. " + F",         hl.dsp.focus({ workspace = "name:arquivos" }))
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.move({ workspace = "name:arquivos" }))
-hl.bind(mainMod .. " + ALT + F",   hl.dsp.exec_cmd([[hyprctl dispatch "'movetoworkspacesilent', 'name:arquivos'"]]))
---TESTE
-
--- Workspaces 1 a 10
-for i = 1, 10 do
-    local key = tostring(i % 10)
-    hl.bind(mainMod .. " + " .. key,           hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key,   hl.dsp.window.move({ workspace = i }))
-    hl.bind(mainMod .. " + ALT + " .. key,     hl.dsp.window.move({ workspace = i, silent = true }))
-    end
-
-    -- Workspaces 11 a 20 (Modificador CTRL)
+-- Workspaces 11 a 20 com Ctrl.
 for i = 1, 10 do
     local key = tostring(i % 10)
     local ws  = i + 10
     hl.bind(mainMod .. " + CTRL + " .. key,         hl.dsp.focus({ workspace = ws }))
     hl.bind(mainMod .. " + CTRL + SHIFT + " .. key, hl.dsp.window.move({ workspace = ws }))
     hl.bind(mainMod .. " + CTRL + ALT + " .. key,   hl.dsp.window.move({ workspace = ws, silent = true }))
-    end
---[ESSE BLOCO ABAIXO NÃO FUNCIONA]
--- Criar novo workspace sempre além do maior aberto (ex: 11, 12...)
-hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd([[sh -c 'next=$(hyprctl workspaces -j | jq "[.[].id | select(. > 0)] | (max // 0) + 1"); hyprctl dispatch workspace "$next"']]))
-hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd([[sh -c 'next=$(hyprctl workspaces -j | jq "[.[].id | select(. > 0)] | (max // 0) + 1"); hyprctl dispatch movetoworkspacesilent "$next"']]))
--- Criar novo workspace sempre além do maior aberto (ex: 11, 12...)
-hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd([[sh -c 'hyprctl dispatch workspace $(hyprctl workspaces | awk "/^workspace ID [0-9]+ / {if (\$3>m) m=\$3} END {print m+1}")']]))
-hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd([[sh -c 'hyprctl dispatch movetoworkspacesilent $(hyprctl workspaces | awk "/^workspace ID [0-9]+ / {if (\$3>m) m=\$3} END {print m+1}")']]))
---[ESSE BLOCO ACIMA NÃO FUNCIONA]
+end
 
--- Alternância de Janelas e Workspaces (Tab e Fuzzel)
-hl.bind("ALT + Tab",         hl.dsp.exec_cmd([[hyprctl --batch "dispatch 'cyclenext' ; dispatch 'bringactivetotop'"]]))
-hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd([[hyprctl --batch "dispatch 'cyclenext', 'prev' ; dispatch 'bringactivetotop'"]]))
-hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd([[hyprctl dispatch "'workspace', 'previous'"]]))
-hl.bind(mainMod .. " + W",   hl.dsp.exec_cmd([[sh -c 'addr=$(hyprctl clients -j | jq -r ".[] | select(.mapped == true) | \"[\(.workspace.name)] \(.class) - \(.title) | \(.address)\"" | fuzzel --dmenu -w 75 | sed "s/.*| //"); [ -n "$addr" ] && hyprctl dispatch "$(printf "\x27focuswindow\x27, \x27address:%s\x27" "$addr")"']]))
+-- Cria o próximo workspace numérico usando o script existente.
+hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd("~/.config/hypr/scripts/next-workspace.sh"))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("~/.config/hypr/scripts/next-workspace.sh silent"))
 
-
--- Workspaces Dedicados (Nomeados)
--- 1. Terminal
+-- Workspaces nomeados: foco, mover janela e mover silenciosamente.
 hl.bind(mainMod .. " + T",         hl.dsp.focus({ workspace = "name:terminal" }))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.move({ workspace = "name:terminal" }))
 hl.bind(mainMod .. " + ALT + T",   hl.dsp.window.move({ workspace = "name:terminal", silent = true }))
 
--- 2. Agenda
 hl.bind(mainMod .. " + A",         hl.dsp.focus({ workspace = "name:agenda" }))
 hl.bind(mainMod .. " + SHIFT + A", hl.dsp.window.move({ workspace = "name:agenda" }))
 hl.bind(mainMod .. " + ALT + A",   hl.dsp.window.move({ workspace = "name:agenda", silent = true }))
 
--- 3. E-mail
 hl.bind(mainMod .. " + ALT + E",         hl.dsp.focus({ workspace = "name:email" }))
 hl.bind(mainMod .. " + ALT + SHIFT + E", hl.dsp.window.move({ workspace = "name:email" }))
 hl.bind(mainMod .. " + ALT + CTRL + E",  hl.dsp.window.move({ workspace = "name:email", silent = true }))
 
--- 4. Arquivos
 hl.bind(mainMod .. " + F",         hl.dsp.focus({ workspace = "name:arquivos" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.move({ workspace = "name:arquivos" }))
 hl.bind(mainMod .. " + ALT + F",   hl.dsp.window.move({ workspace = "name:arquivos", silent = true }))
@@ -284,7 +229,7 @@ hl.window_rule({
     no_focus = true,
 })
 
--- Aplicativos fixos nos seus workspaces nomeados
+-- Aplicativos fixos nos workspaces nomeados
 hl.window_rule({
     name      = "auto-email-workspace",
     match     = { class = "thunderbird" },
@@ -307,16 +252,16 @@ hl.window_rule({
 hl.window_rule({
     name  = "floating-terminal",
     match = { class = "^(foot|footclient)$" },
-               float = true,
+    float = true,
 })
 
--- Picture-in-Picture (Navegadores)
+-- Picture-in-Picture (navegadores)
 hl.window_rule({
     name              = "pip-floating",
     match             = { title = "^(Picture-in-Picture|Imagem sobre imagem)$" },
-               float             = true,
-               pin               = true,
-               keep_aspect_ratio = true,
+    float             = true,
+    pin               = true,
+    keep_aspect_ratio = true,
 })
 
 -- Diálogos do VS Code
@@ -324,7 +269,7 @@ hl.window_rule({
     name  = "vscode-dialogs",
     match = {
         class = "^(code|Code|code-oss)$",
-               title = "^(Open Folder|Open File|Save As|Workspace Trust)$",
+        title = "^(Open Folder|Open File|Save As|Workspace Trust)$",
     },
     float  = true,
     center = true,

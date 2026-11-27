@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fluxo do ambiente — Hyprland + Waybar</title>
+<style>
+  :root {
+    --ink: #0b0d12;
+    --bg: #13161f;
+    --surface: #1c202b;
+    --border: #2c3342;
+    --accent: #4f9cf9;
+    --accent-soft: #2a4f7a;
+    --green: #36d08f;
+    --muted: #9aa3b2;
+    --text: #eceff5;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 28px 20px 48px;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  p.intro {
+    color: var(--muted);
+    max-width: 760px;
+    margin: 0 0 16px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  @media (max-width: 820px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .95rem;
+  }
+
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0 2px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-width: 160px;
+    text-align: center;
+  }
+
+  .node .name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .node .sub {
+    font-size: .85rem;
+    color: var(--muted);
+    max-width: 240px;
+    line-height: 1.4;
+  }
+
+  .node.pc .name { color: var(--accent); }
+  .node.script .name { color: var(--green); }
+  .node.config .name { color: var(--accent); }
+
+  .arrow {
+    color: var(--muted);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    justify-content: center;
+    margin-top: 16px;
+    font-size: .9rem;
+    color: var(--muted);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .tag .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .tag.accent .dot { background: var(--accent); }
+  .tag.script .dot { background: var(--green); }
+  .tag.config .dot { background: var(--accent-soft); }
+
+  footer {
+    margin-top: 22px;
+    font-size: .85rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .note {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    font-size: .9rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Fluxo do ambiente — Hyprland + Waybar</h1>
+  <p class="intro">
+    Diagrama do seu setup atual: Arquitetura do sistema, configurações e scripts que são
+    executados por cada camada.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Sistema &amp; composto</h2>
+      <p>
+        Arquitetura base, gerenciamento de memória e onde o console roda.
+      </p>
+      <div class="flow">
+        <div class="row">
+          <div class="node pc">
+            <div class="name">Arch Linux</div>
+            <div class="sub">Kernel + pacman + Zram (swap na RAM) + SSD de raiz</div>
+          </div>
+          <div class="arrow">▼</div>
+        </div>
+        <div class="row">
+          <div class="node config">
+            <div class="name">Hyprland</div>
+            <div class="sub">Compositor Wayland, config em <em>hyprland.lua</em></div>
+          </div>
+          <div class="arrow">▼</div>
+        </div>
+        <div class="row">
+          <div class="node script">
+            <div class="name">Waybar</div>
+            <div class="sub">Barra de Status, config em <em>waybar/config.jsonc</em></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="node pc">
+            <div class="name">Foot — terminal</div>
+            <div class="sub">Terminal ligado ao Wayland / XWayland</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Arquivos &amp; scripts de configuração</h2>
+      <p>
+        Onde ficam guardados os atalhos, configurações do Hyprland e os scripts de atalho.
+      </p>
+      <div class="flow">
+        <div class="row">
+          <div class="node config">
+            <div class="name">hyprland.lua</div>
+            <div class="sub">Configuração do Hyprland: layout, atalhos, regras</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="node config">
+            <div class="name">waybar/config.jsonc</div>
+            <div class="sub">Módulos do Waybar: CPU, RAM, GPU, rede, atalhos</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="node script">
+            <div class="name">hyprland-shortcuts.sh</div>
+            <div class="sub">Lista atalhos no Fuzzel (SUPER + Ctrl + B)</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="node script">
+            <div class="name">hyprland-shortcuts-bar.sh</div>
+            <div class="sub">Mostra contagem de atalhos no barra Waybar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="tag accent"><span class="dot"></span> Sistema / compositor</span>
+    <span class="tag config"><span class="dot"></span> Configuração</span>
+    <span class="tag script"><span class="dot"></span> Script</span>
+  </div>
+
+  <div class="note">
+    Este diagrama mostra a arquitetura do desktop e os pontos de contato entre o Hyprland,
+    o Waybar e os scripts do repositório <em>dotfiles/hypr</em>.
+  </div>
+</div>
+
+<footer>
+  Gerado para <span class="text">Vianna</span> — Arch Linux, Hyprland, Waybar, Intel HD 4000.
+</footer>
+</body>
+</html>
